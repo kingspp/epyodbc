@@ -31,9 +31,6 @@ class Table(BaseClass):
         self.foreign_keys.append(column)
 
     def pretty(self):
-        return {
-            "table_name": self.table_name,
-            "primary_key": self.primary_key.pretty(),
-            "columns": [col.pretty() for col in self.columns],
-            "foreign_keys": [fk.pretty() for fk in self.foreign_keys]
-        }
+        return {col.column_name: col.pretty() for col in self.columns}
+            # "foreign_keys": [fk.pretty() for fk in self.foreign_keys]
+#

@@ -39,7 +39,8 @@ class Column(BaseClass):
         # self.default = default
 
     def pretty(self):
-        ret = f"{self.column_name} {self.dtype}({self.length})"
+        # ret = f"{self.column_name} {self.dtype}({self.length})"
+        ret = f"{self.dtype}({self.length})"
         if self.is_primary_key:
             ret += "| PRIMARY "
         if self.is_foreign_key:

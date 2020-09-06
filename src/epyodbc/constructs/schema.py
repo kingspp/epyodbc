@@ -24,5 +24,5 @@ class Schema(BaseClass):
     def pretty(self):
         return {
             "database": self.database,
-            "tables": [t.pretty() for t in self.tables]
+            "tables": {t.table_name: t.pretty() for t in self.tables}
         }
