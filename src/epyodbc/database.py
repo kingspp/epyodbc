@@ -18,6 +18,7 @@ from epyodbc.constructs import Schema, Table, Column, ForeignKey
 import pandas as pd
 from graphviz import Source
 import pydot
+import typing
 
 
 class Database(object):
@@ -42,7 +43,7 @@ class Database(object):
     def query(self, query: str):
         return pd.read_sql(query, con=self.conn)
 
-    def visualize(self):
+    def visualize(self, tables: typing.Union[str, typing.List[str]] = None):
         start = "digraph {" \
                 'graph [pad="0.5", nodesep="0.5", ranksep="2"];' \
                 'node [shape=plain]' \
@@ -51,29 +52,35 @@ class Database(object):
         str_buffer = [start]
         schema = self.describe(pretty=False, jupyter=False, return_schema=True)
 
-        for table in schema.tables:
-            table_str = f'{table.table_name} [label=<<table border="0" cellborder="1" cellspacing="0">' \
-                        f'<tr><td bgcolor="lightblue2"><font face="Times-bold" point-size="20">{table.table_name}</font></td></tr>'
-            for e, column in enumerate(table.columns):
-                if column.is_primary_key:
-                    table_str += f'<tr><td bgcolor="#FFCCCB" port="{e}">{column.column_name} <i>&lt;{column.dtype}({column.length})&gt;</i></td></tr>'
-                elif column.is_foreign_key:
-                    table_str += f'<tr><td bgcolor="#FFED83" port="{e}">{column.column_name} <i>&lt;{column.dtype}({column.length})&gt;</i></td></tr>'
-                else:
-                    table_str += f'<tr><td port="{e}">{column.column_name} <i>&lt;{column.dtype}({column.length})&gt;</i></td></tr>'
+        # check if table is a str
+        if isinstance(tables, str):
+            tables = [tables]
 
-            table_str += f'</table>>];'
-            str_buffer.append(table_str)
+        for table in schema.tables:
+            if table.table_name in tables:
+                table_str = f'{table.table_name} [label=<<table border="0" cellborder="1" cellspacing="0">' \
+                            f'<tr><td bgcolor="lightblue2"><font face="Times-bold" point-size="20">{table.table_name}</font></td></tr>'
+                for e, column in enumerate(table.columns):
+                    if column.is_primary_key:
+                        table_str += f'<tr><td bgcolor="#FFCCCB" port="{e}">{column.column_name} <i>&lt;{column.dtype}({column.length})&gt;</i></td></tr>'
+                    elif column.is_foreign_key:
+                        table_str += f'<tr><td bgcolor="#FFED83" port="{e}">{column.column_name} <i>&lt;{column.dtype}({column.length})&gt;</i></td></tr>'
+                    else:
+                        table_str += f'<tr><td port="{e}">{column.column_name} <i>&lt;{column.dtype}({column.length})&gt;</i></td></tr>'
+
+                table_str += f'</table>>];'
+                str_buffer.append(table_str)
 
         # Build Relationships
         for table in schema.tables:
-            for fk in table.foreign_keys:
-                from_table = table.table_name
-                from_port = [e for e, column in enumerate(table.columns) if column.column_name == fk.column_name][0]
-                to_table = fk.foreign_key.table
-                f_table = [table for table in schema.tables if table.table_name == fk.foreign_key.table][0]
-                to_port = [e for e, column in enumerate(f_table.columns) if column.column_name == fk.foreign_key.key][0]
-                str_buffer.append(f'{from_table}:{from_port} -> {to_table}:{to_port};')
+            if table.table_name in tables:
+                for fk in table.foreign_keys:
+                    from_table = table.table_name
+                    from_port = [e for e, column in enumerate(table.columns) if column.column_name == fk.column_name][0]
+                    to_table = fk.foreign_key.table
+                    f_table = [table for table in schema.tables if table.table_name == fk.foreign_key.table][0]
+                    to_port = [e for e, column in enumerate(f_table.columns) if column.column_name == fk.foreign_key.key][0]
+                    str_buffer.append(f'{from_table}:{from_port} -> {to_table}:{to_port};')
         str_buffer.append(end)
         g = pydot.graph_from_dot_data("\n".join(str_buffer))[0]
         return Source(g)
