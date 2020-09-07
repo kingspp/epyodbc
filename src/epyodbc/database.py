@@ -20,12 +20,39 @@ from graphviz import Source
 import pydot
 import typing
 import dask.dataframe as dd
+import os
+import json
+
 
 class Database(object):
-    def __init__(self, config: dict):
-        self.database = config["database"]
-        self.port = config["port"]
+    """
+
+    """
+
+    def __init__(self, config: dict = None, config_file_path: str = None):
+        try:
+            if config is None:
+                if config_file_path is None:
+                    if 'EPYODBC_DBCONFIG' not in os.environ:
+                        raise Exception(
+                            "Server credentials missing! Set EPYODBC_DBCONFIG Environment variable or pass configs/config_file_path to the constructor")
+                    else:
+                        config_file_path = os.environ['EPYODBC_DBCONFIG']
+                print(f"Loading server config from : {config_file_path}")
+                config = json.load(open(config_file_path))
+        except Exception as e:
+            print(e)
+            exit(1)
+
+        assert "host" in config, f"host key missing in config file: {config_file_path}"
+        assert "port" in config, f"port key missing in config file: {config_file_path}"
+        assert "database" in config, f"database key missing in config file: {config_file_path}"
+        assert "username" in config, f"username key missing in config file: {config_file_path}"
+        assert "password" in config, f"password key missing in config file: {config_file_path}"
+
         self.host = config["host"]
+        self.port = config["port"]
+        self.database = config["database"]
         self.username = config["username"]
         self.password = config["password"]
         self.conn = self.connect()
