@@ -26,10 +26,20 @@ import json
 
 class Database(object):
     """
+    Database Class
 
+    PyODBC is geared towards software developers with a focus on building enterprise applications.
+        * Bridging Data Science - Data Scientists and Experimentalists have specific needs and to achieve the same using standard ORM tool can be an arduous task
+        * GUI - Graphical User Interface provides makes a job easy as it just takes a few clicks to learn about a feature
     """
 
     def __init__(self, config: dict = None, config_file_path: str = None):
+        """
+        Database Class constructor
+
+        :param config: Dictionary Based configuration. Required keys are "host", "port", "database", "username", "password"
+        :param config_file_path: Also supports file based configuration. The file should be in JSON format with the above keys.
+        """
         try:
             if config is None:
                 if config_file_path is None:
@@ -70,7 +80,12 @@ class Database(object):
                                                             uri=f'mssql+pyodbc://{config["username"]}:{config["password"]}@{config["host"]}:{config["port"]}/{config["database"]}?DRIVER={{ODBC Driver 17 for SQL Server}};',
                                                             index_col=self.index_cols[table]))
 
-    def connect(self):
+    def connect(self) -> pyodbc.Connection:
+        """
+        API used to connect to a database. This is called by default, use this only if you face reconnection issue.
+        To access connection use conn object of the class
+        :return: PyODBC Connection
+        """
         try:
             conn = pyodbc.connect(
                 'DRIVER={ODBC Driver 17 for SQL Server};SERVER=' + self.host + ',' + self.port + ';DATABASE=' + self.database + ';UID=' + self.username + ';PWD=' + self.password)
@@ -81,10 +96,23 @@ class Database(object):
             print(e)
             exit(1)
 
-    def query(self, query: str):
+    def query(self, query: str) -> pd.DataFrame:
+        """
+        Execute query using pandas and return the results in a DataFrame
+
+        :param query: SQL Query
+        :return: Query results in a Pandas Dataframe
+        """
         return pd.read_sql(query, con=self.conn)
 
-    def visualize(self, tables: typing.Union[str, typing.List[str]] = None, render=True):
+    def visualize(self, tables: typing.Union[str, typing.List[str]] = None, render=True) -> typing.Union[str, 'Image']:
+        """
+        Schema Visualization
+
+        :param tables: List of Table Names
+        :param render: render PNG Image or return Markup
+        :return: Either markup string or an image
+        """
         start = "digraph {" \
                 'graph [pad="0.5", nodesep="0.5", ranksep="2"];' \
                 'node [shape=plain]' \
@@ -134,7 +162,18 @@ class Database(object):
             return str_buffer
 
     def describe(self, tables: typing.Union[str, typing.List[str]] = None, pretty=True, jupyter=True, debug=False,
-                 return_json=False, return_schema=False):
+                 return_json=False, return_schema=False) -> typing.Union[str, Schema]:
+        """
+        Describe Schema using an Interactive jupyterlab widget
+
+        :param tables: List of Table Names
+        :param pretty: If enabled, removes unwanted details in the JSON
+        :param jupyter: If enabled returns an interactive JSON widget
+        :param debug: Print debug statements
+        :param return_json: Return schema in form of a JSON
+        :param return_schema: Return schema in the form of a Schema Object (refer, epyodbc.constructs.Schema for more details)
+        :return: String or Schema Object based on return configuration
+        """
         if isinstance(tables, str):
             tables = [tables]
         else:
