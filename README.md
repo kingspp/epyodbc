@@ -1,39 +1,47 @@
-# A sample Python project
+# EPyODBC
 
-![Python Logo](https://www.python.org/static/community_logos/python-logo.png "Sample inline image")
+PyODBC is geared towards software developers with a focus on building enterprise applications.
+<ul>
+<li><b>Bridging Data Science</b> -  Data Scientists and Experimentalists have specific needs and to achieve the same using standard ORM tool can be an arduous task </li>
 
-A sample project that exists as an aid to the [Python Packaging User
-Guide][packaging guide]'s [Tutorial on Packaging and Distributing
-Projects][distribution tutorial].
+<li><b>GUI</b> - Graphical User Interface provides makes a job easy as it just takes a few clicks to learn about a feature</li>
+</ul>
 
-This project does not aim to cover best practices for Python project
-development as a whole. For example, it does not provide guidance or tool
-recommendations for version control, documentation, or testing.
+## Features
+1. Schema Visualization (Supports both Image and Tree Format)
+2. Table Autompletion, Info, Description and Head
+3. Tables are lazily evaluation
+4. Support for Dask Dataframe for dense tables
+5. Queries returned as Pandas DF
 
-[The source for this project is available here][src].
+## Requirements
+Python 3.7+
+Jupyter Lab (Support for custom widgets)
+MSSQL instance and PyODBC drivers
 
-Most of the configuration for a Python project is done in the `setup.py` file,
-an example of which is included in this project. You should edit this file
-accordingly to adapt this sample project to your needs.
+## Installation
+```bash
+pip install git+https://github.com/kingspp/epyodbc.git#egg=epyodbc
+```
 
-----
+## Connect to a Database
+```python
+# Import Database
+from epyodbc import Database
 
-This is the README file for the project.
+# Using config
+config = {
+    "host": "0.0.0.0",
+    "port": "1433",
+    "database": 'master',
+    "username": "username",
+    "password": "password"
+}
 
-The file should use UTF-8 encoding and can be written using
-[reStructuredText][rst] or [markdown][md use] with the appropriate [key set][md
-use]. It will be used to generate the project webpage on PyPI and will be
-displayed as the project homepage on common code-hosting services, and should be
-written for that purpose.
+# Create a Database object using config
+db = Database(config=config)
+```
 
-Typical contents for this file would include an overview of the project, basic
-usage examples, etc. Generally, including the project changelog in here is not a
-good idea, although a simple “What's New” section for the most recent version
-may be appropriate.
+Get started with - [Starter kit Jupyter Notebook](https://github.com/kingspp/epyodbc/blob/master/notebooks/EPyODBC%20Introduction.ipynb)
 
-[packaging guide]: https://packaging.python.org
-[distribution tutorial]: https://packaging.python.org/tutorials/packaging-projects/
-[src]: https://github.com/pypa/sampleproject
-[rst]: http://docutils.sourceforge.net/rst.html
-[md]: https://tools.ietf.org/html/rfc7764#section-3.5 "CommonMark variant"
-[md use]: https://packaging.python.org/specifications/core-metadata/#description-content-type-optional
+
