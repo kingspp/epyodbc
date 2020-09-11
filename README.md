@@ -13,6 +13,7 @@ PyODBC is geared towards software developers with a focus on building enterprise
 3. Tables are lazily evaluation
 4. Support for Dask Dataframe for dense tables
 5. Queries returned as Pandas DF
+6. Support for Interactive JupyterLab Widgets
 
 ## Requirements
 Python 3.7+
