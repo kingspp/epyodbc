@@ -1,3 +1,14 @@
+<!-- Start of Badges -->
+![version badge](https://img.shields.io/badge/epyodbc%20version-0.1.8-blue.svg)
+![docs badge](https://img.shields.io/badge/docs-passing-green.svg)
+![commits badge](https://img.shields.io/badge/commits%20since%200.1.8-5-green.svg)
+![footprint badge](https://img.shields.io/badge/mem%20footprint%20-0.06%20Mb-lightgrey.svg)
+<!--![build badge](https://img.shields.io/badge/build-passing-green.svg)
+![coverage badge](https://img.shields.io/badge/coverage-87.78%25|%205.8k/6.6k%20lines-green.svg)
+![test badge](https://img.shields.io/badge/tests-418%20total%7C418%20%E2%9C%93%7C0%20%E2%9C%98-green.svg)  -->
+
+<!-- End of Badges -->
+
 # EPyODBC
 
 PyODBC is geared towards software developers with a focus on building enterprise applications.
