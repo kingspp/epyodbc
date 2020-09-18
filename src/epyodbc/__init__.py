@@ -10,12 +10,15 @@
 | **Sphinx Documentation Status:**
 """
 
-__all__ = ['Database', '__version__', 'EPYODBC_MODULE_PATH']
-
-from epyodbc.database import Database
+__all__ = ['Database', '__version__', 'EPYODBC_MODULE_PATH', 'ASSET_PATH']
 import os
 import json
 
+
 EPYODBC_MODULE_PATH = os.path.dirname(os.path.abspath(__file__))
+ASSET_PATH = EPYODBC_MODULE_PATH+"/assets/"
 metadata = json.load(open(EPYODBC_MODULE_PATH + "/metadata.json"))
 __version__ = metadata['version']
+
+
+from epyodbc.database import Database

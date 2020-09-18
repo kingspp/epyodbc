@@ -22,6 +22,11 @@ import typing
 import dask.dataframe as dd
 import os
 import json
+from epyodbc import ASSET_PATH
+import html as HTML
+from graphviz2drawio import graphviz2drawio
+from epyodbc.xml_generator import XMLGenerator
+from bs4 import BeautifulSoup
 
 
 class Database(object):
@@ -119,13 +124,16 @@ class Database(object):
                 'rankdir=LR;'
         end = '}'
         str_buffer = [start]
-        schema = self.describe(pretty=False, jupyter=False, return_schema=True)
 
         # check if table is a str
         if isinstance(tables, str):
             tables = [tables]
+        elif isinstance(tables, list):
+            pass
         else:
             tables = self.tables
+
+        schema = self.describe(tables=tables, pretty=False, jupyter=False, return_schema=True)
 
         for table in schema.tables:
             if table.table_name in tables:
@@ -179,7 +187,7 @@ class Database(object):
         else:
             tables = self.tables
 
-        schema = Schema(database=self.database)
+        self.schema = Schema(database=self.database)
         cursor = self.conn.cursor()
         # Add tables
 
@@ -208,17 +216,46 @@ class Database(object):
                     if bool(is_foreign_key):
                         table.add_foreign_key(column=col)
 
-                schema.add_table(table=table)
+                self.schema.add_table(table=table)
         if pretty:
-            data = schema.pretty()
+            data = self.schema.pretty()
         else:
-            data = schema.toJSON()
+            data = self.schema.toJSON()
 
         if jupyter:
             return IPython.display.JSON(data, root="Schema")
         elif return_schema:
-            return schema
+            return self.schema
         elif return_json:
             return data
         else:
             print(data)
+
+    def iframe(self):
+        from IPython.display import IFrame
+        import xml.etree.ElementTree as ET
+
+        dg = self.visualize(tables=["Users"], render=False)
+        # print(dg)
+        # src = Source(dg)
+        # print(src._repr_svg_())
+        print(dg)
+        xml = graphviz2drawio.convert(dg)
+
+        # print(BeautifulSoup(xml, 'data.xml').prettify())
+        return IFrame(src=f"http://localhost:8000/render/{xml}", width=1200, height=600)
+
+    def toxml(self):
+        xml = XMLGenerator(
+            svg=Source(self.visualize(render=False))._repr_svg_(), schema=self.schema).generate()
+        return xml
+
+    def _repr_html_(self):
+        html = open(ASSET_PATH + "/index.html").read()
+        # print(html)
+        # css = open(ASSET_PATH+"/style.css").read()
+        # script = open(ASSET_PATH + "/main.js").read()
+        # html = html.replace("<style></style>", f"<style>{css}</style>")
+        # html = html.replace("<script></script>", f"<script>{script}</script>")
+        # print(html)
+        return html

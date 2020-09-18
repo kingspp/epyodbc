@@ -145,7 +145,7 @@ setup(
     #
     # For an analysis of "install_requires" vs pip's requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=['pyodbc', 'ipython', 'pandas', 'graphviz', 'pydot', 'dask'],  # Optional
+    install_requires=['pyodbc', 'ipython', 'pandas', 'graphviz', 'pydot', 'dask', "fastapi", "dataclasses", "jupyterlab", "aiofiles", "jinja2"],  # Optional
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). Users will be able to install these using the "extras"
